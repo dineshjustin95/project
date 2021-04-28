@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- CSS only -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<!-- Slider -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.css">
+
+</head>
+<body>
+  <app-root></app-root>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<!-- Slider -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://rawgit.com/cfoehrdes/slick/master/slick/slick.js"></script>
+<!-- Scrollanimation -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.4/gsap.min.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.4/ScrollTrigger.min.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.1/gsap.min.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.1/ScrollTrigger.min.js"></script> -->
+
+
+<!-- navbar -->
+<script>
+  $(document).ready(function() {
+        // Transition effect for navbar 
+        $(window).scroll(function() {
+          // checks if window is scrolled more than 500px, adds/removes solid class
+          if($(this).scrollTop() > 500) { 
+              $('.navbar').addClass('solid');
+          } else {
+              $('.navbar').removeClass('solid');
+          }
+        });
+});
+</script>
+
+<!-- Slider -->
+<script>
+jQuery(document).ready(function() {
+  jQuery(".c-slider-init").slick({
+    dots: false,
+    nav: false,
+    arrows: false,
+    infinite: true,
+    speed: 1200,
+    autoplaySpeed: 5000,
+    slidesToShow: 1,
+    adaptiveHeight: true,
+    autoplay: true,
+    draggable: false,
+    pauseOnFocus: false,
+    pauseOnHover: false
+  });
+
+  jQuery(".slick-current").addClass("initialAnimation");
+
+  let transitionSetup = {
+    target: ".slick-list",
+    enterClass: "u-scale-out",
+    doTransition: function() {
+      var slideContainer = document.querySelector(this.target);
+      slideContainer.classList.add(this.enterClass);
+      jQuery(".slick-current").removeClass("animateIn");
+    },
+    exitTransition: function() {
+      var slideContainer = document.querySelector(this.target);
+      setTimeout(() => {
+        slideContainer.classList.remove(this.enterClass);
+        jQuery(".slick-current").addClass("animateIn");
+      }, 2000);
+    }
+  };
+
+  var i = 0;
+  // On before slide change
+  jQuery(".c-slider-init").on("beforeChange", function(
+                              event,
+                               slick,
+                               currentSlide,
+                               nextSlide
+                              ) {
+    if (i == 0) {
+      event.preventDefault();
+      transitionSetup.doTransition();
+      i++;
+    } else {
+      i = 0;
+      transitionSetup.exitTransition();
+    }
+
+    jQuery(".c-slider-init").slick("slickNext");
+    jQuery(".slick-current").removeClass("initialAnimation");
+  });
+});
+</script>
+
+<!-- Dropdown -->
+<script>
+  $(document).ready(function(){
+  $(".button").click(function() {
+    $(".dropdown a").removeClass("clicked");
+    $(".dropdown a").children("span").removeClass("clicked");
+    $(".arrow").toggleClass("open");
+    $(".dropdown").toggleClass("open");
+  });
+  
+  $(".dropdown a").click(function() {
+    $(".dropdown a").removeClass("clicked");
+    $(".dropdown a").children("span").removeClass("clicked");
+    $(this).toggleClass("clicked");  $(this).children("span").toggleClass("clicked");
+  });
+});
+</script>
+<!-- Dropdown -->
+
+<!-- homepage scroll -->
+<script>
+  // ------------- VARIABLES ------------- //
+var ticking = false;
+var isFirefox = (/Firefox/i.test(navigator.userAgent));
+var isIe = (/MSIE/i.test(navigator.userAgent)) || (/Trident.*rv\:11\./i.test(navigator.userAgent));
+var scrollSensitivitySetting = 30; //Increase/decrease this number to change sensitivity to trackpad gestures (up = less sensitive; down = more sensitive) 
+var slideDurationSetting = 600; //Amount of time for which slide is "locked"
+var currentSlideNumber = 0;
+var totalSlideNumber = 5;
+
+// ------------- DETERMINE DELTA/SCROLL DIRECTION ------------- //
+function parallaxScroll(evt) {
+  if (isFirefox) {
+    //Set delta for Firefox
+    delta = evt.detail * (-120);
+  } else if (isIe) {
+    //Set delta for IE
+    delta = -evt.deltaY;
+  } else {
+    //Set delta for all other browsers
+    delta = evt.wheelDelta;
+  }
+
+  if (ticking != true) {
+    if (delta <= -scrollSensitivitySetting) {
+      //Down scroll
+      ticking = true;
+      if (currentSlideNumber !== totalSlideNumber - 1) {
+        currentSlideNumber++;
+        nextItem();
+      }
+      slideDurationTimeout(slideDurationSetting);
+    }
+    if (delta >= scrollSensitivitySetting) {
+      //Up scroll
+      ticking = true;
+      if (currentSlideNumber !== 0) {
+        currentSlideNumber--;
+      }
+      previousItem();
+      slideDurationTimeout(slideDurationSetting);
+    }
+  }
+}
+
+// ------------- SET TIMEOUT TO TEMPORARILY "LOCK" SLIDES ------------- //
+function slideDurationTimeout(slideDuration) {
+  setTimeout(function() {
+    ticking = false;
+  }, slideDuration);
+}
+
+// ------------- ADD EVENT LISTENER ------------- //
+var mousewheelEvent = isFirefox ? "DOMMouseScroll" : "wheel";
+window.addEventListener(mousewheelEvent, _.throttle(parallaxScroll, 60), false);
+
+// ------------- SLIDE MOTION ------------- //
+function nextItem() {
+  var $previousSlide = $(".background").eq(currentSlideNumber - 1);
+  $previousSlide.removeClass("up-scroll").addClass("down-scroll");
+}
+
+function previousItem() {
+  var $currentSlide = $(".background").eq(currentSlideNumber);
+  $currentSlide.removeClass("down-scroll").addClass("up-scroll");
+}
+</script>
+<!-- homepage scroll -->
+
+<!-- Home2 parallax -->
+<script>
+  const translate = document.querySelectorAll(".translate");
+const big_title = document.querySelector(".big-title");
+const header = document.querySelector("header");
+const shadow = document.querySelector(".shadow");
+const content = document.querySelector(".content");
+const section = document.querySelector("section");
+const image_container = document.querySelector(".imgContainer");
+const opacity = document.querySelectorAll(".opacity");
+const border = document.querySelector(".border");
+
+let header_height = header.offsetHeight;
+let section_height = section.offsetHeight;
+
+window.addEventListener('scroll', () => {
+    let scroll = window.pageYOffset;
+    let sectionY = section.getBoundingClientRect();
+    
+    translate.forEach(element => {
+        let speed = element.dataset.speed;
+        element.style.transform = `translateY(${scroll * speed}px)`;
+    });
+
+    opacity.forEach(element => {
+        element.style.opacity = scroll / (sectionY.top + section_height);
+    })
+
+    big_title.style.opacity = - scroll / (header_height / 2) + 1;
+    shadow.style.height = `${scroll * 0.5 + 300}px`;
+
+    content.style.transform = `translateY(${scroll / (section_height + sectionY.top) * 50 - 50}px)`;
+    image_container.style.transform = `translateY(${scroll / (section_height + sectionY.top) * -50 + 50}px)`;
+
+    border.style.width = `${scroll / (sectionY.top + section_height) * 30}%`;
+})
+</script>
+
+</body>
+</html>
